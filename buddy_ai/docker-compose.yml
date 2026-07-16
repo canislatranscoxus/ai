@@ -1,0 +1,38 @@
+# Name of the Docker Compose project
+name: 'crewai_slim'
+
+services:
+  # The main Ollama engine that hosts and runs the AI models
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434" # Exposes the Ollama API port to your host machine
+    volumes:
+      - ./.data/ollama:/root/.ollama # Persists downloaded models on your local hard drive
+    restart: unless-stopped
+
+
+  # Descargador automático corregido (Sin errores de JSON)
+  llama3:
+    image: curlimages/curl:latest
+    container_name: llama3
+    entrypoint: /bin/sh
+    command: -c "sleep 10 && curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"llama3\"}'"
+    depends_on:
+      - ollama
+
+  # Tu entorno CrewAI con orden de ejecución explícita
+  crewai:
+    build: .
+    image: canislatranscoxus/crewai_slim:latest
+    container_name: crewai_workspace
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - .env:/app/.env
+    command: ["python", "-m", "src.main"]
+    depends_on:
+      - ollama
