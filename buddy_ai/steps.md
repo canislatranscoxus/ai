@@ -1,4 +1,4 @@
-# Steps
+# Steps for docker compose
 
 Here we show the steps and commands to create the docker images,
 run the containers,
@@ -12,7 +12,7 @@ and of course monitor and check the logs.
 docker builder prune -f
 docker compose up -d --build
 
-# --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ## how to run my containers ( and download my llm models too )
 
@@ -52,3 +52,4 @@ docker compose start crewai
 ```
 docker compose logs -f crewai
 ```
+--------------------------------------------------------------------------------

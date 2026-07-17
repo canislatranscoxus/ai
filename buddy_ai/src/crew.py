@@ -5,13 +5,12 @@ from crewai_tools import FileReadTool
 
 
 local_llm = LLM(
-    model="ollama/llama3",
-    base_url="http://localhost:11434"
+    model="ollama/llama3.2",
+    base_url="http://ollama:11434"
 )
 
-
 txt_tool = FileReadTool(
-    file_path='/home/appuser/apps/buddy_ai/sample_document.txt',
+    file_path='/app/config/sample_document.txt',
     llm=local_llm
 )
 
@@ -20,8 +19,8 @@ txt_tool = FileReadTool(
 class BuddyAi():
     """BuddyAi crew"""
 
-    agents_config = 'config/agents.yaml'
-    tasks_config  = 'config/tasks.yaml'
+    agents_config = '/app/config/agents.yaml'
+    tasks_config  = '/app/config/tasks.yaml'
 
     @agent
     def txt_reader(self) -> Agent:
@@ -50,7 +49,7 @@ class BuddyAi():
     def summarizing_task(self) -> Task:
         return Task(
             config  = self.tasks_config[ 'summarizing_task' ],
-            output_file = 'output/summary.md'
+            output_file = '/app/config/summary.md'
         )
 
 

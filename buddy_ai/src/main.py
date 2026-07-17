@@ -19,7 +19,22 @@ def run():
     inputs = { }
 
     try:
-        BuddyAi().crew().kickoff(inputs=inputs)
+        #BuddyAi().crew().kickoff(inputs=inputs)
+
+        # Kickoff the crew execution
+        result = BuddyAi().crew().kickoff(inputs=inputs)
+
+        # Explicitly print the result to the console so it shows up in Docker logs
+        print("\n######################")
+        print("## CREWAI RESULTS: ##")
+        print("######################\n")
+        print(result)
+
+        # save to a file inside the mounted app directory
+        with open("src/crew_output.txt", "w") as f:
+            f.write(str(result))
+
+
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
@@ -82,3 +97,6 @@ def test():
 #         return result
 #     except Exception as e:
 #         raise Exception(f"An error occurred while running the crew with trigger: {e}")
+
+if __name__ == "__main__":
+    run()
