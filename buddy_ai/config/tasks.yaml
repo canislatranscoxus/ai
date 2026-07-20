@@ -1,7 +1,10 @@
 reading_task:
   description: >
     Extract the entire text from the TXT document at /app/config/sample_document.txt.
-    Return the raw text content without modification.
+    CRITICAL TOOL INSTRUCTION: When executing the 'read_a_files_content' tool, 
+    you MUST provide valid integers for the arguments. Set 'start_line' to 1 
+    and 'line_count' to 5000 (or any large integer). NEVER pass the string 'null' 
+    or 'None' to these fields. Return the raw text content without modification.
   expected_output: >
     The complete extracted text of the TXT document.
   agent: txt_reader
@@ -16,3 +19,24 @@ summarizing_task:
     - reading_task
   output_file: /app/config/summary.md
 
+quiz_task:
+  description: >
+    Using the summary of the TXT's content, create a quiz with multiple-choice questions that test understanding of the main concepts.
+    Provide say, 5 multiple-choice questions. Each question should have 4 options and indicate the correct answers.
+  expected_output: >
+    A quiz with 5 multiple-choice questions and their correct answers.
+  agent: quiz_maker
+  context:
+    - summarizing_task
+  output_file: /app/config/quiz.md
+
+user_test_task:
+  description: >
+    Present the quiz questions to the user and ask them to provide their answers.
+    After the user responds, check the correctness and provide a final score.
+  expected_output: >
+    A summary of user performance, e.g. "You answered X out of Y questions correctly."
+  agent: study_buddy
+  context:
+    - quiz_task
+  human_input: true

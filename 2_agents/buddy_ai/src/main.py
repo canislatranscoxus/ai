@@ -34,10 +34,6 @@ def run():
         with open("src/crew_output.txt", "w") as f:
             f.write(str(result))
 
-        import time
-        print( "\n[Sistema] Flujo completado. El contenedor permanecerá activo por 2 minutos para revisión..." )
-        time.sleep( 120 )
-
 
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")

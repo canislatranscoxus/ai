@@ -2,7 +2,7 @@ name: 'crewai_slim'
 
 services:
 
-  # Descargador automático inteligente
+    # Descargador automático inteligente (Garantiza que Ollama responda antes de descargar)
   llama3:
     image: curlimages/curl:latest
     container_name: llama3
@@ -10,22 +10,23 @@ services:
     command: -c "curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"llama3.2\"}'"
     depends_on:
       ollama:
-        condition: service_healthy # Espera a que Ollama responda
+        condition: service_healthy # <--- Espera a que Ollama diga "estoy sano"
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama
     container_name: ollama
     ports:
       - "11434:11434"
     volumes:
       - ./.data/ollama:/root/.ollama
     restart: unless-stopped
-    # Solución definitiva usando el binario oficial de ollama para validar su estado
+    # Agrega esto para avisarle a Docker cuándo está lista la API:
     healthcheck:
-      test: [ "CMD", "ollama", "list" ]
+      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
       interval: 5s
       timeout: 5s
       retries: 5
+
 
   # Entorno CrewAI conectado a la red interna de Docker
   crewai:
@@ -37,15 +38,8 @@ services:
     volumes:
       - ./src:/app/src
       - ./config:/app/config
-      # Nota: Corregido el mapeo del archivo .env a formato Docker estándar
-      - ./.env:/app/.env
+      - .env:/app/.env
     command: ["python", "-m", "src.main"]
-    # CRÍTICO: Estas dos líneas permiten que la terminal no se congele
-    # y puedas responder las preguntas del Quiz del agente study_buddy
-    stdin_open: true
-    tty: true
     depends_on:
-      ollama:
-        condition: service_healthy
-
+      - ollama
 

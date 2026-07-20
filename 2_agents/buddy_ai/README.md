@@ -43,25 +43,6 @@ graph LR
 - Modify `src/main.py` to add custom inputs for your agents and tasks
 
 
-## How to Run and interact with the agents
-
-### terminal 1
-
-```shell
-docker compose up --build
-```
-
-### terminal 2
-
-```shell
-docker exec -it crewai_workspace python -m src.main
-
-```
-
---------------------------------------------------------------------------------
-
-
-
 ## create image and containers
 ```
 docker compose up --build
@@ -90,7 +71,7 @@ The buddy_ai Crew is composed of multiple AI agents, each with unique roles, goa
 
 ## links
 
-Github Coyote style - my updated code for learning and practising.  
+Github Coyote style - my updated code for learning and practising. 
 https://github.com/canislatranscoxus/ai/tree/main/buddy_ai
 
 AI AgentProject with Python by CrewAI by Packt Publishing

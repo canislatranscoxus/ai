@@ -1,0 +1,18 @@
+reading_task:
+  description: >
+    Extract the entire text from the TXT document at /app/config/sample_document.txt.
+    Return the raw text content without modification.
+  expected_output: >
+    The complete extracted text of the TXT document.
+  agent: txt_reader
+
+summarizing_task:
+  description: >
+    Take the provided TXT text and summarize it into a concise overview that highlights the main points.
+  expected_output: >
+    A concise summary (around 2-4 paragraphs) highlighting the key themes and facts from the document.
+  agent: summarizer
+  context:
+    - reading_task
+  output_file: /app/config/summary.md
+
