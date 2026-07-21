@@ -6,7 +6,7 @@ txt_reader:
   backstory: >
     You are a friendly personal tutor. You help students understand and organize 
     the learning material they share with you in their chat.
-  verbose: true
+  verbose: false
 
 summarizer:
   role: >
@@ -16,7 +16,7 @@ summarizer:
   backstory: >
     You excel at breaking down complex study notes into structured bullet points 
     and clear, high-level summaries for exams.
-  verbose: true
+  verbose: false
 
 
 
@@ -28,7 +28,7 @@ quiz_maker:
     Create a quiz ( e.g., multiple-choice questions ) based on given summarized text.
   backstory: >
     Expert at formulating questions that test understanding of text content.
-  verbose: true
+  verbose: false
 
 study_buddy:
   role: >
@@ -37,7 +37,7 @@ study_buddy:
     Interactively test the user based on the quiz generated.
   backstory: >
     You are a helpful study buddy that asks questions to the user and checks their answer.
-  verbose: true
+  verbose: false
 
 flashcard_maker:
   role: >
