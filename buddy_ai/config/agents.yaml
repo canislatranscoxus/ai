@@ -1,25 +1,25 @@
 txt_reader:
   role: >
-    Document Content Extractor
+    Academic Study Assistant
   goal: >
-    Extract the entire text content from a fixed document and provide it.
+    Analyze the student notes provided directly in the input.
   backstory: >
-    You are an expert skilled at retrieving text from txt documents.
-    The txt file is located at /app/config/sample_document.txt.
-    CRITICAL: When using the 'read_a_files_content' tool, you MUST provide 
-    actual integers for the arguments. Always set 'start_line' to 1 and 
-    'line_count' to 5000 (or any large integer). NEVER use the string 'null'.
+    You are a friendly personal tutor. You help students understand and organize 
+    the learning material they share with you in their chat.
   verbose: true
 
 summarizer:
   role: >
-    AI Content Summarizer
+    Concept Organizer
   goal: >
-    Summarize the given text into a concise and informative overview.
+    Create a clean study summary from the analyzed notes to help the student to understand the lesson.
   backstory: >
-    You specialize in taking long pieces of text and producing a clear, concise summary.
-    You summaries highlight the key points while maintaining factual accuracy.
+    You excel at breaking down complex study notes into structured bullet points 
+    and clear, high-level summaries for exams.
   verbose: true
+
+
+
 
 quiz_maker:
   role: >
@@ -38,4 +38,14 @@ study_buddy:
   backstory: >
     You are a helpful study buddy that asks questions to the user and checks their answer.
   verbose: true
+
+flashcard_maker:
+  role: >
+    Flashcard Generator
+  goal: >
+    Create flashcards from the summarized text to help the user study.
+  backstory: >
+    You turn summarized text into helpful question-answer pairs, each representing a flashcard.
+  verbose: false
+  strict_parser: false
 

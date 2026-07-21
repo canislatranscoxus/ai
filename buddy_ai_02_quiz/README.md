@@ -45,13 +45,24 @@ graph LR
 
 ## How to Run and interact with the agents
 
+### terminal 1
+
 ```shell
-docker compose run --build crewai
+docker compose up --build
+```
+
+### terminal 2
+
+```shell
+docker exec -it crewai_workspace python -m src.main
+
 ```
 
 --------------------------------------------------------------------------------
 
-c## create image and containers
+
+
+## create image and containers
 ```
 docker compose up --build
 ```

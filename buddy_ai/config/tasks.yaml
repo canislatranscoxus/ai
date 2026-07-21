@@ -1,23 +1,30 @@
 reading_task:
   description: >
-    Extract the entire text from the TXT document at /app/config/sample_document.txt.
-    CRITICAL TOOL INSTRUCTION: When executing the 'read_a_files_content' tool, 
-    you MUST provide valid integers for the arguments. Set 'start_line' to 1 
-    and 'line_count' to 5000 (or any large integer). NEVER pass the string 'null' 
-    or 'None' to these fields. Return the raw text content without modification.
+    Review these personal study notes provided by the student:
+    ---
+    {document_text}
+    ---
+    Identify and the main ideas of the lesson, core concepts, and key definitions 
+    found in these notes so we can build a study guide.
   expected_output: >
-    The complete extracted text of the TXT document.
+    A detailed list of the academic concepts, important ideas from the lesson, and fable and vocabulary found in the notes.
   agent: txt_reader
 
 summarizing_task:
   description: >
-    Take the provided TXT text and summarize it into a concise overview that highlights the main points.
+    Take the list of concepts from the previous step and organize them into 
+    a concise study overview (2-4 paragraphs) highlighting the most important facts.
+    So the student can understand the most important points.
   expected_output: >
-    A concise summary (around 2-4 paragraphs) highlighting the key themes and facts from the document.
+    A structured study summary formatted in markdown.
   agent: summarizer
   context:
     - reading_task
   output_file: /app/config/summary.md
+
+
+
+
 
 quiz_task:
   description: >
@@ -39,4 +46,27 @@ user_test_task:
   agent: study_buddy
   context:
     - quiz_task
+  human_input: true
+
+
+flashcard_task:
+  description: >
+    Using the summary of the TXT's content, create 5 flashcards. Each card has a "front" 
+    ( question or term ) and a "back" ( explanation ).
+  expected_output: >
+    A structured list or text specifying each flashcard's front and back.
+  agent: flashcard_maker
+  context:
+    - summarizing_task
+  output_file: /app/config/flashcards.txt
+
+study_flashcard_task:
+  description: >
+    Go through the flashcards one by one with the user. The user can type "show" to display a card's front,
+    and "flip" to reveal its back, or "quit" to exit.
+  expected_output: >
+    Interactive session with the user. No final text is required, just user engagement.
+  agent: study_buddy
+  context:
+    - flashcard_task
   human_input: true

@@ -9,44 +9,38 @@ from src.crew import BuddyAi
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 
-# Dentro de src/main.py
+
+
 
 def run():
-    inputs = {}
-
-    # RUTA ABSOLUTA dentro del contenedor Docker
-    file_path = "/app/config/sample_document.txt"
-
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            document_content = f.read()
-
-        # Guardamos el texto en los inputs para CrewAI
-        inputs["document_text"] = document_content
-
-        # VERIFICACIÓN: Esto saldrá en tu pantalla para confirmar que no está vacío
-        print(f"\n📂 [DEBUG] Archivo leído con éxito. Caracteres detectados: {len(document_content)}")
-        if len(document_content) == 0:
-            print("⚠️ [ALERTA] ¡El archivo está completamente vacío!")
-
-    except Exception as e:
-        print(f"❌ [ERROR] No se pudo leer el archivo desde Python: {e}")
-        inputs["document_text"] = "Error cargando las notas."
+    """
+    Run the crew.
+    """
+    inputs = { }
 
     try:
-        print("🤖 Inicializando BuddyAi Crew...", flush=True)
+        #BuddyAi().crew().kickoff(inputs=inputs)
+
+        # Kickoff the crew execution
         result = BuddyAi().crew().kickoff(inputs=inputs)
 
-        print("\n######################", flush=True)
-        print("## CREWAI RESULTS: ##", flush=True)
-        print("######################\n", flush=True)
-        print(result, flush=True)
+        # Explicitly print the result to the console so it shows up in Docker logs
+        print("\n######################")
+        print("## CREWAI RESULTS: ##")
+        print("######################\n")
+        print(result)
+
+        # save to a file inside the mounted app directory
+        with open("src/crew_output.txt", "w") as f:
+            f.write(str(result))
+
+        import time
+        print( "\n[Sistema] Flujo completado. El contenedor permanecerá activo por 2 minutos para revisión..." )
+        time.sleep( 120 )
+
 
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
-
-
-
 
 
 def train():
@@ -75,21 +69,9 @@ def test():
     Test the crew execution and returns the results.
     """
     inputs = { }
-    # Leemos el archivo directamente desde Python antes de iniciar la Crew
-    try:
-        with open("/app/config/sample_document.txt", "r", encoding="utf-8") as f:
-            document_content = f.read()
-        inputs["document_text"] = document_content
-    except Exception as e:
-        print(f"⚠️ Error al leer el archivo desde Python: {e}")
-        inputs["document_text"] = "No se pudo cargar el documento."
-
 
     try:
-        #BuddyAi().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
-        print("🤖 Initializing BuddyAi Crew...", flush=True)
-        result = BuddyAi().crew().kickoff(inputs=inputs)
+        BuddyAi().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
 
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")

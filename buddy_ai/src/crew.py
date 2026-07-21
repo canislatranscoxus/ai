@@ -13,9 +13,10 @@ local_llm = LLM(
 
 # Inicialización limpia: Sin pasar el LLM aquí, la herramienta actúa como un lector directo de archivos planos,
 # no como un buscador RAG confuso para modelos pequeños.
-txt_tool = FileReadTool(
-    file_path=TXT_PATH
-)
+
+#txt_tool = FileReadTool(
+#    file_path=TXT_PATH
+#)
 
 @CrewBase
 class BuddyAi():
@@ -29,9 +30,16 @@ class BuddyAi():
         return Agent(
             config  = self.agents_config['txt_reader'],
             verbose = True,
-            tools   = [txt_tool],
-            llm     = local_llm
+            #tools   = [txt_tool],
+            llm     = local_llm,
+            allow_delegation = False,
+            max_iter = 3, # Le da oportunidades de corregir si escribe un JSON erróneo
         )
+
+
+
+
+
 
     @agent
     def summarizer(self) -> Agent:
@@ -57,6 +65,19 @@ class BuddyAi():
             verbose = True,
             llm     = local_llm,
         )
+
+    @agent
+    def flashcard_maker(self) -> Agent:
+        return Agent(
+            config  = self.agents_config['flashcard_maker'],
+            verbose = False,
+            strict_parser = False,
+            #function_calling_LLm = None,
+            llm=local_llm
+
+        )
+
+
 
     @task
     def reading_task(self) -> Task:
@@ -87,6 +108,84 @@ class BuddyAi():
         return Task(
             config  = self.tasks_config['user_test_task']
         )
+
+
+    @task
+    def flashcard_task(self) -> Task:
+        return Task(
+            config = self.tasks_config[ 'flashcard_task' ]
+        )
+
+    @task
+    def study_flashcards_task(self) -> Task:
+        def study_logic( agent, inputs, context ):
+            # parse the flashcards from the flashcard_task output
+            # let the user type show, flip or quit t navigate them.
+
+            flashcards_text = context.get( 'flashcards_task', '' )
+
+            if not flashcards_text.strip():
+                return "BuddyAi.study_flashcards_task.study_logic(), No flashcards found. Possibly an error."
+
+            agent.think( "Parsing flashcards from text ..." )
+
+            # 1) front: ...
+            #    back:  ...
+
+            lines = [ l.strip() for l in flashcards_text.splitlines() if l.strip() ]
+            flashcards = []
+            current_fc = {}
+
+            for line in lines:
+
+                if line.lower().startswith( "front:" ):
+                    current_fc = {
+                                    "front": line[ 6: ].strip(),
+                                    "back": ""
+                                   }
+                elif line.lower().startswith( "back:" ):
+                    current_fc[ "back" ] = line[ 5: ].strip()
+                    flashcards.append( current_fc )
+                    current_fc = {}
+
+            if not flashcards:
+                return "BuddyAi.study_flashcards_task.study_logic(), Couldn't parse flashcards from text."
+
+            agent.say( f"I have { len( flashcards ) } flashcards loaded. We'll go through them now \n" )
+            agent.say( "Type 'show' to see the next flashcard, 'flip' to see its back, or 'quit' to exit.'  " )
+
+            index = 0
+            showing_front = False
+            user_input = inputs.get( 'human_input', '' ).lower()
+
+            if user_input == 'quit':
+                return "Exiting flashcard study session"
+
+            if index >= len( flashcards ):
+                return "No more flashcards left."
+
+            if user_input == 'show':
+                agent.say( f"Flashcard { index + 1 } front: { flashcards[ index ][ 'front' ] }\n " )
+                showing_front = True
+                return "Type 'flip' next time to see the back, or 'quit' to exit. "
+            elif user_input == 'flip' and not showing_front:
+                return "You need to 'show' the card first. Then you can 'flip' it "
+            elif user_input == 'flip' and     showing_front:
+                #show the back
+                agent.say( f"Flashcard { index + 1} back: { flashcards[ index ][ 'back' ] }" )
+                return f"Now you can type 'show' to move to the next flashcard, or 'quit' to exit. "
+            else:
+                return "Invalid command. Please type 'show', 'flip' or 'quit' "
+
+
+        return Task(
+            config       = self.tasks_config[ 'study_flashcard_task' ],
+            Logic        = study_logic,
+            human_inputs = True
+        )
+
+
+
 
     @crew
     def crew(self) -> Crew:
